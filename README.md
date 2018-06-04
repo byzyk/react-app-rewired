@@ -1,7 +1,6 @@
- 
 [![npm version](https://img.shields.io/npm/v/react-app-rewired.svg)](https://www.npmjs.com/package/react-app-rewired)
 [![npm monthly downloads](https://img.shields.io/npm/dm/react-app-rewired.svg)](https://www.npmjs.com/package/react-app-rewired)
- 
+
  <img alt="react-app-rewired" src="https://github.com/timarney/react-app-rewired/raw/master/assets/react-app-rewired.png" />
 
 # Rewire Your App
@@ -18,8 +17,8 @@ All the benefits of create-react-app without the limitations of "no config". You
 
 # How to rewire your create-react-app project
 
-
 #### 1) Install react-app-rewired
+
 ```bash
 $ npm install react-app-rewired --save-dev
 ```
@@ -32,7 +31,7 @@ $ npm install react-app-rewired --save-dev
 module.exports = function override(config, env) {
   //do stuff with the webpack config...
   return config;
-}
+};
 ```
 
 ```
@@ -48,6 +47,7 @@ module.exports = function override(config, env) {
 **Note:** You can use one of the default rewires (see the [packages](/packages) dir) or [injectBabelPlugin](https://github.com/timarney/react-app-rewired#utilities-injectbabelplugin)
 
 #### 3) 'Flip' the existing calls to `react-scripts` in `npm` scripts
+
 ```diff
   /* package.json */
 
@@ -62,64 +62,68 @@ module.exports = function override(config, env) {
 ```
 
 #### 4) Start the Dev Server
+
 ```bash
 $ npm start
 ```
 
-
 #### 5) Build your app
+
 ```bash
 $ npm run build
 ```
 
-
-## Utilities 
+## Utilities
 
 #### 1) injectBabelPlugin
 
-Adding a Babel plugin can be done via the `injectBabelPlugin(pluginName, config)` function.  You can also use the "rewire" packages from this repo or listed below to do common config modifications.
+Adding a Babel plugin can be done via the `injectBabelPlugin(pluginName, config)` function. You can also use the "rewire" packages from this repo or listed below to do common config modifications.
 
 ```javascript
 const rewireMobX = require('react-app-rewire-mobx');
 const rewirePreact = require('react-app-rewire-preact');
-const {injectBabelPlugin} = require('react-app-rewired');
+const { injectBabelPlugin } = require('react-app-rewired');
 
 /* config-overrides.js */
 module.exports = function override(config, env) {
   // add a plugin
-  config = injectBabelPlugin('emotion/babel',config)
-  
+  config = injectBabelPlugin('emotion/babel', config);
+
   // use the Preact rewire
-  if (env === "production") {
-    console.log("⚡ Production build with Preact");
+  if (env === 'production') {
+    console.log('⚡ Production build with Preact');
     config = rewirePreact(config, env);
   }
-  
+
   // use the MobX rewire
-  config = rewireMobX(config,env);
-  
+  config = rewireMobX(config, env);
+
   return config;
-}
+};
 ```
 
 #### 2) compose(after v1.3.4)
 
 You can use this util to compose rewires.
-> A functional programming utility, performs `right-to-left` function composition.     
-More detail you can see [ramda](http://ramdajs.com/docs/#compose) or [redux](http://redux.js.org/docs/api/compose.html#composefunctions)  
+
+> A functional programming utility, performs `right-to-left` function composition.  
+> More detail you can see [ramda](http://ramdajs.com/docs/#compose) or [redux](http://redux.js.org/docs/api/compose.html#composefunctions)
 
 Before:
+
 ```javascript
 /* config-overrides.js */
 module.exports = function override(config, env) {
   config = rewireLess(config, env);
   config = rewirePreact(config, env);
   config = rewireMobX(config, env);
-  
+
   return config;
-}
+};
 ```
+
 After use `compose`:
+
 ```javascript
 /* config-overrides.js */
 const { compose } = require('react-app-rewired');
@@ -130,7 +134,7 @@ module.exports = compose(
   rewireMobx
   ...
 )
-//  custom config 
+//  custom config
 module.exports = function(config, env){
   const rewires = compose(
     rewireLess,
@@ -143,29 +147,35 @@ module.exports = function(config, env){
   return rewires(config, env);
 }
 ```
-Some change with rewire, if you want to add some `extra param` for `rewire`  
-1. Optional params:  
-you can see [react-app-rewire-less](https://github.com/timarney/react-app-rewired/blob/master/packages/react-app-rewire-less/index.js)  
 
-2. Required params:  
+Some change with rewire, if you want to add some `extra param` for `rewire`
+
+1.  Optional params:  
+    you can see [react-app-rewire-less](https://github.com/timarney/react-app-rewired/blob/master/packages/react-app-rewire-less/index.js)
+
+2.  Required params:
+
 ```javascript
 // rewireSome.js
-function createRewire(requiredParams){
-  return function rewire(config, env){
+function createRewire(requiredParams) {
+  return function rewire(config, env) {
     ///
-    return config
-  }
+    return config;
+  };
 }
 module.exports = createRewire;
 ```
 
 ## Extended Configuration Options
+
 By default, the `config-overrides.js` file exports a single function to use when customising the webpack configuration for compiling your react app in development or production mode. It is possible to instead export an object from this file that contains up to three fields, each of which is a function. This alternative form allows you to also customise the configuration used for Jest (in testing), and for the Webpack Dev Server itself.
 
 This example implementation is used to demonstrate using each of the object require functions. In the example, the functions:
+
 * use the react-app-rewire-less package to add less support to your project
 * have some tests run conditionally based on `.env` variables
 * set the https certificates to use for the Development Server, with the filenames specified in `.env` file variables.
+
 ```javascript
 module.exports = {
   // The Webpack config to use when compiling your react app for development or production.
@@ -186,7 +196,9 @@ module.exports = {
       config.testPathIgnorePatterns = [];
     }
     if (!process.env.RUN_COMPONENT_TESTS) {
-      config.testPathIgnorePatterns.push('<rootDir>/src/components/**/*.test.js');
+      config.testPathIgnorePatterns.push(
+        '<rootDir>/src/components/**/*.test.js',
+      );
     }
     if (!process.env.RUN_REDUCER_TESTS) {
       config.testPathIgnorePatterns.push('<rootDir>/src/reducers/**/*.test.js');
@@ -212,20 +224,22 @@ module.exports = {
         key: fs.readFileSync(process.env.REACT_HTTPS_KEY, 'utf8'),
         cert: fs.readFileSync(process.env.REACT_HTTPS_CERT, 'utf8'),
         ca: fs.readFileSync(process.env.REACT_HTTPS_CA, 'utf8'),
-        passphrase: process.env.REACT_HTTPS_PASS
+        passphrase: process.env.REACT_HTTPS_PASS,
       };
 
       // Return your customised Webpack Development Server config.
       return config;
-    }
-  }
-}
+    };
+  },
+};
 ```
 
 #### 1) Webpack configuration - Development & Production
+
 The `webpack` field is used to provide the equivalent to the single-function exported from config-overrides.js. This is where all the usual rewires are used. It is not able to configure compilation in test mode because test mode does not get run through Webpack at all (it runs in Jest). It is also not able to be used to customise the Webpack Dev Server that is used to serve pages in development mode because create-react-app generates a separate Webpack configuration for use with the dev server using different functions and defaults.
 
 #### 2) Jest configuration - Testing
+
 Webpack is not used for compiling your application in Test mode - Jest is used instead. This means that any rewires specified in your webpack config customisation function _will not be applied_ to your project in test mode.
 
 React-app-rewired automatically allows you to customise your Jest configuration in a `jest` section of your `package.json` file, including allowing you to set configuration fields that create-react-app would usually block you from being able to set. It also automatically sets up Jest to compile the project with Babel prior to running tests. Jest's configuration options are documented separately at the [Jest website](https://facebook.github.io/jest/docs/en/configuration.html).
@@ -235,6 +249,7 @@ If you want to add plugins and/or presets to the Babel configuration that Jest w
 The `jest` field in the module.exports object in `config-overrides.js` is used to specify a function that can be called to customise the Jest testing configuration in ways that are not possible in the jest section of the package.json file. For example, it will allow you to change some configuration options based on environment variables. This function is passed the default create-react-app Jest configuration as a parameter and is required to return the modified Jest configuration that you want to use. A lot of the time you'll be able to make the configuration changes needed simply by using a combination of the `package.json` file's jest section and a `.babelrc` file (or babel section in package.json) instead of needing to provide this jest function in `config-overrides.js`.
 
 #### 3) Webpack Dev Server
+
 When running in development mode, create-react-app does not use the usual Webpack config for the Development Server (the one that serves the app pages). This means that you cannot use the normal `webpack` section of the `config-overrides.js` server to make changes to the Development Server settings as those changes won't be applied.
 
 Instead of this, create-react-app expects to be able to call a function to generate the webpack dev server when needed. This function is provided with parameters for the proxy and allowedHost settings to be used in the webpack dev server (create-react-app retrieves the values for those parameters from your package.json file).
@@ -242,8 +257,10 @@ Instead of this, create-react-app expects to be able to call a function to gener
 React-app-rewired provides the ability to override this function through use of the `devServer` field in the module.exports object in `config-overrides.js`. It provides the devServer function a single parameter containing the default create-react-app function that is normally used to generate the dev server config (it cannot provide a generated version of the configuration because react-scripts is calling the generation function directly). React-app-rewired needs to receive as a return value a _replacement function_ for create-react-app to then use to generate the Development Server configuration (i.e. the return value should be a new function that takes the two parameters for proxy and allowedHost and itself returns a Webpack Development Server configuration). The original react-scripts function is passed into the `config-overrides.js` devServer function so that you are able to easily call this yourself to generate your initial devServer configuration based on what the defaults used by create-react-app are.
 
 #### 4) Provide rewired webpack config for 3rd party tools
+
 Some third party tools, like [`react-cosmos`](https://github.com/react-cosmos/react-cosmos) relies on your webpack config.
 You can create `webpack.config.js` file and export rewired config using following snippet:
+
 ```js
 const { paths } = require('react-app-rewired');
 // require normalized overrides
@@ -256,33 +273,42 @@ module.exports = overrides.webpack(config, process.env.NODE_ENV);
 Then just point to this file in tool configuration.
 
 ## Additional Issues and Options
+
 #### 1) Entry Point: 'src/index.js'
+
 At this point in time, it is difficult to change the entry point from the default `src/index.js` file due to the way that file is included by create-react-app. The normal rewiring process gets bypassed by several of the create-react-app scripts.
 
 There are three work-arounds available here:
-1. Simply require/import your desired file from inside the src/index.js file, like:
+
+1.  Simply require/import your desired file from inside the src/index.js file, like:
+
 ```javascript
 require('./index.tsx');
 ```
-2. Use a customised version of the react-scripts package that changes the entry point inside the scripts themselves (e.g. [react-scripts-ts](https://github.com/wmonk/create-react-app-typescript) for a typescript project - see below for how to use custom script versions with react-app-rewired).
-3. Override the `react-dev-utils/checkRequiredFiles` function to always return true (causing create-react-app to no longer try to enforce that the entry file must exist).
+
+2.  Use a customised version of the react-scripts package that changes the entry point inside the scripts themselves (e.g. [react-scripts-ts](https://github.com/wmonk/create-react-app-typescript) for a typescript project - see below for how to use custom script versions with react-app-rewired).
+3.  Override the `react-dev-utils/checkRequiredFiles` function to always return true (causing create-react-app to no longer try to enforce that the entry file must exist).
 
 #### 2) Custom scripts versions
+
 It is possible to use a custom version of the `react-scripts` package with react-app-rewired by specifying the name of the scripts package in the command line option `--scripts-version`.
 
 A working example for using the scripts version option is:
+
 ```json
 {
   "scripts": {
     "start": "react-app-rewired start --scripts-version react-scripts-ts",
     "build": "react-app-rewired build --scripts-version react-scripts-ts",
-    "test": "react-app-rewired test --scripts-version react-scripts-ts --env=jsdom",
+    "test":
+      "react-app-rewired test --scripts-version react-scripts-ts --env=jsdom",
     "eject": "react-scripts eject"
   }
 }
 ```
 
 React-app-rewired requires a custom react-scripts package to provide the following files:
+
 * config/env.js
 * config/webpack.config.dev.js
 * config/webpack.config.prod.js
@@ -293,11 +319,13 @@ React-app-rewired requires a custom react-scripts package to provide the followi
 * scripts/utils/createJestConfig.js
 
 #### 3) Specify config-overrides as a directory
+
 React-app-rewired imports your config-overrides.js file without the '.js' extension. This means that you have the option of creating a directory called `config-overrides` at the root of your project and exporting your overrides from the default `index.js` file inside that directory.
 
 If you have several custom overrides using a directory allows you to be able to put each override in a separate file. An example template that demonstrates this can be found in [Guria/rewired-ts-boilerplate](https://github.com/Guria/rewired-ts-boilerplate/tree/master/config-overrides) at Github.
 
 #### 4) Specify config-overrides location from command line
+
 If you need to change the location of your config-overrides.js you can pass a command line option --config-overrides <path> to the react-app-rewired script.
 
 # Community Maintained Rewires
@@ -325,6 +353,7 @@ If you need to change the location of your config-overrides.js you can pass a co
 * [react-app-rewire-preload-plugin](https://github.com/lwd-technology/react-app-rewire-preload-plugin) by [@jtheis85](https://github.com/jtheis85)
 * [react-app-rewire-provide-plugin](https://github.com/lwd-technology/react-app-rewire-provide-plugin) by [@jtheis85](https://github.com/jtheis85)
 * [react-app-rewire-inline-source](https://github.com/marcopeg/react-app-rewire-inline-source) by [@marcopeg](https://github.com/marcopeg)
+* [react-app-rewire-webpack-bundle-analyzer](https://github.com/byzyk/react-app-rewire-webpack-bundle-analyzer) by [@byzyk](https://github.com/byzyk)
 
 ## Loaders
 
@@ -354,5 +383,3 @@ If you need to change the location of your config-overrides.js you can pass a co
 # Why This Project Exists
 
 See: [Create React App — But I don’t wanna Eject.](https://medium.com/@timarney/but-i-dont-wanna-eject-3e3da5826e39#.x81bb4kji)
-
-
